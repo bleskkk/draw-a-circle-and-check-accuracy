@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draw a Circle</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 1px solid black;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Draw a Circle</h1>
+    <canvas id="drawingCanvas" width="400" height="400"></canvas>
+    <button id="checkButton">Check Accuracy</button>
+    <div id="result"></div>
+
+    <script>
+        const canvas = document.getElementById('drawingCanvas');
+        const context = canvas.getContext('2d');
+        let isDrawing = false;
+        let points = [];
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            points = [];
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.beginPath();
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDrawing) {
+                const x = e.offsetX;
+                const y = e.offsetY;
+                points.push({x, y});
+                context.lineTo(x, y);
+                context.stroke();
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDrawing = false;
+            context.closePath();
+        });
+
+        document.getElementById('checkButton').addEventListener('click', () => {
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+            const radius = canvas.width / 2;
+            let totalDistance = 0;
+
+            points.forEach(point => {
+                const dx = point.x - centerX;
+                const dy = point.y - centerY;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                totalDistance += Math.abs(distance - radius);
+            });
+
+            const averageDistance = totalDistance / points.length;
+            const accuracy = Math.max(0, 100 - (averageDistance / radius) * 100);
+
+            document.getElementById('result').innerText = `Circle Accuracy: ${accuracy.toFixed(2)}%`;
+        });
+    </script>
+</body>
+</html>
